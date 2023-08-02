@@ -7,7 +7,7 @@ const connection = mysql.createConnection({
     // Your MySQL username,
     user: 'root',
     // Replace with your MySQL password
-    password: 'Please put your SQL password here',
+    password: 'Dirtrally2.0',
     database: 'employee_db'
 });
 

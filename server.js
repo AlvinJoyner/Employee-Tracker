@@ -1,22 +1,22 @@
-// Dependencies required
-const inquirer = require("inquirer");
-const dbQueries = require("./db/dbQueries.js");
-const connection = require("./db/connection");
+// Import required modules
+const inquirer = require("inquirer"); // Inquirer module for interactive command-line prompts
+const dbQueries = require("./db/dbQueries.js"); // Custom module for database queries
+const connection = require("./db/connection"); // MySQL connection module
 
-// Start server after db connection
+// Start the server after establishing a database connection
 connection.connect((err) => {
   if (err) throw err;
   console.log("Database is connected.");
   console.log("WELCOME TO SQL-EMPLOYEE-TRACKER");
-  start();
+  start(); // Call the main function to begin the application
 });
 
 // Function to start the command-line application
 function start() {
+  // Prompt the user with a list of options
   inquirer
     .prompt([
       {
-        // Beginning in the Command Line
         type: "list",
         name: "prompt",
         message: "What would you like to do?",
@@ -37,42 +37,42 @@ function start() {
     ])
     .then(async (answer) => {
       console.log(answer);
+      // Perform actions based on the user's choice
       switch (answer.prompt) {
-        // Call the respective functions based on the user's choice
         case "View Employees":
-          await viewAll("employees");
+          await viewAll("employees"); // View all employees
           break;
         case "View Roles":
-          await viewAll("roles");
+          await viewAll("roles"); // View all roles
           break;
         case "View Departments":
-          await viewAll("departments");
+          await viewAll("departments"); // View all departments
           break;
         case "Add Employee":
-          await addEmployee();
+          await addEmployee(); // Add a new employee
           break;
         case "Add Role":
-          await addRole();
+          await addRole(); // Add a new role
           break;
         case "Add Department":
-          await addDepartment();
+          await addDepartment(); // Add a new department
           break;
         case "Update Employee Role":
-          await updateEmployee();
+          await updateEmployee(); // Update an employee's role
           break;
         case "Delete Employee":
-          await deleteEntry("employee", "employeeId", "Which employee would you like to delete?");
+          await deleteEntry("employee", "employeeId", "Which employee would you like to delete?"); // Delete an employee
           break;
         case "Delete Role":
-          await deleteEntry("role", "roleId", "Which role would you like to delete?");
+          await deleteEntry("role", "roleId", "Which role would you like to delete?"); // Delete a role
           break;
         case "Delete Department":
-          await deleteEntry("department", "departmentId", "Which department would you like to delete?");
+          await deleteEntry("department", "departmentId", "Which department would you like to delete?"); // Delete a department
           break;
         case "Quit":
-          return quit();
+          return quit(); // Exit the application
       }
-      // After processing the user's choice, start the application again
+      // After processing the user's choice, restart the application
       start();
     });
 }
@@ -80,7 +80,7 @@ function start() {
 // Function to view all data (employees, roles, or departments) based on user input
 async function viewAll(entity) {
   const data = await dbQueries["viewAll" + entity[0].toUpperCase() + entity.slice(1)]();
-  console.table(data);
+  console.table(data); // Display the data in a table format
 }
 
 // Function to add a new department
@@ -90,12 +90,12 @@ async function addDepartment() {
     message: "What is the name of the department?",
     name: "name",
   });
-  await dbQueries.createDepartment(department);
+  await dbQueries.createDepartment(department); // Add the new department to the database
 }
 
 // Function to add a new employee
 async function addEmployee() {
-  // Get the available roles and managers
+  // Get the available roles and managers from the database
   const rolesPrompt = await dbQueries.viewAllRoles();
   const managerPrompt = await dbQueries.getAllEmployees();
 
@@ -117,7 +117,7 @@ async function addEmployee() {
   const { roleId } = await inquirer.prompt({
     type: "list",
     name: "roleId",
-    message: "What is this new employee role?",
+    message: "What is this new employee's role?",
     choices: roleListChoices,
   });
 
@@ -127,6 +127,7 @@ async function addEmployee() {
     value: id,
   }));
 
+  // Prompt the user to select the new employee's manager (if available)
   if (managerChoicesList && managerChoicesList.length > 0) {
     const { managerId } = await inquirer.prompt({
       type: "list",
@@ -139,7 +140,7 @@ async function addEmployee() {
 
   employeeToAdd.role_id = roleId;
 
-  await dbQueries.createEmployee(employeeToAdd);
+  await dbQueries.createEmployee(employeeToAdd); // Add the new employee to the database
 }
 
 // Function to add a new role
@@ -166,7 +167,7 @@ async function addRole() {
     },
   ]);
 
-  await dbQueries.addRole(roleToAdd);
+  await dbQueries.addRole(roleToAdd); // Add the new role to the database
 }
 
 // Function to update an employee's role
@@ -204,7 +205,7 @@ async function updateEmployee() {
     },
   ]);
 
-  await dbQueries.updateEmployeeRole(employeeId, roleId);
+  await dbQueries.updateEmployeeRole(employeeId, roleId); // Update the employee's role in the database
 }
 
 // Function to delete an employee, role, or department
